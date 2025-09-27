@@ -14,14 +14,14 @@ def hp_bar(name, icon, hp, max_hp):
     return f"{name} {icon} [{bar}] {hp}/{max_hp}"
 
 def animate_attack(attacker, defender):
-
+    """Простая анимация удара"""
     for frame in ["⚔️      ", "  ⚔️    ", "    ⚔️  ", "      ⚔️💥"]:
         print(f"{attacker} атакует {defender}{frame}")
         time.sleep(0.2)
         clear_screen()
 
 def get_valid_choice(prompt, min_val, max_val):
-
+    """Проверка ввода числа в диапазоне"""
     while True:
         choice = input(prompt)
         if choice.isdigit():
@@ -31,13 +31,16 @@ def get_valid_choice(prompt, min_val, max_val):
         print(f"Введите число от {min_val} до {max_val}!")
 
 def get_yes_no(prompt):
+    """Проверка ввода y/n"""
     while True:
         choice = input(prompt).lower()
         if choice in ["y", "n", "у", "н"]:
             return choice in ["y", "у"]
         print("Введите 'y' или 'n' (или 'у'/'н').")
 
-
+# --------------------------
+# Константы
+# --------------------------
 CLASS_OF_CHARACTER = {
     'Воин': {'hp_per_level': 5, 'starting_weapon': ("Меч", 3, "Рубящий")},
     'Варвар': {'hp_per_level': 6, 'starting_weapon': ("Дубина", 3, "Дробящий")},
@@ -71,7 +74,9 @@ MONSTER_ICONS = {
     "Дракон": "🐉"
 }
 
-
+# --------------------------
+# Базовый персонаж
+# --------------------------
 class Character:
     def __init__(self, name, hp, strength, dexterity, endurance, weapon):
         self.name = name
@@ -90,12 +95,14 @@ class Character:
     def take_damage(self, damage, source=None):
         self.hp = max(0, self.hp - damage)
 
-
+# --------------------------
+# Герой
+# --------------------------
 class Hero(Character):
     def __init__(self, name, hero_class, strength, dexterity, endurance):
-        self.weapon = CLASS_OF_CHARACTER[hero_class]['starting_weapon']
-        self.base_hp = CLASS_OF_CHARACTER[hero_class]['hp_per_level'] + endurance
-        super().__init__(name, self.base_hp, strength, dexterity, endurance, self.weapon)
+        weapon = CLASS_OF_CHARACTER[hero_class]['starting_weapon']
+        base_hp = CLASS_OF_CHARACTER[hero_class]['hp_per_level'] + endurance
+        super().__init__(name, base_hp, strength, dexterity, endurance, weapon)
         self.levels = {'Воин': 0, 'Варвар': 0, 'Разбойник': 0}
         self.levels[hero_class] = 1
         self.total_levels = 1
@@ -172,6 +179,9 @@ class Hero(Character):
         self.hp = self.max_hp
         print(f"{self.name} теперь {self.levels} уровней. HP = {self.hp}/{self.max_hp}")
 
+# --------------------------
+# Монстры
+# --------------------------
 class Monster(Character):
     def __init__(self, template):
         super().__init__(template["name"], template["hp"], template["strength"],
@@ -191,11 +201,11 @@ class Monster(Character):
         bonus = 0
         desc = ""
 
-        if self.name == "Слайм" and target.weapon[2] == "Рубящий":
+        if self.name == "Слайм" and self.weapon[2] == "Рубящий":
             base = self.strength
             desc += "Слайм невосприимчив к рубящему оружию. "
 
-        if self.name == "Скелет" and target.weapon[2] == "Дробящий":
+        if self.name == "Скелет" and self.weapon[2] == "Дробящий":
             base *= 2
             desc += "Скелет получает двойной урон. "
 
@@ -207,7 +217,9 @@ class Monster(Character):
         target.take_damage(damage, source=self)
         print(f"{self.name} наносит {damage} урона. {desc}")
 
-
+# --------------------------
+# Игровой цикл
+# --------------------------
 class Game:
     def __init__(self):
         self.hero = None
@@ -215,10 +227,10 @@ class Game:
 
     def menu(self):
         clear_screen()
-        print("Добро пожаловать в автобатлер хорошей игры")
+        print("=== АВТОБАТТЛЕР ===")
         print("1. Создать героя")
         print("2. Выйти")
-        choice = get_valid_choice("Ваш выбор ", 1, 2)
+        choice = get_valid_choice("> ", 1, 2)
         if choice == 1:
             self.create_hero()
             self.play()
@@ -231,7 +243,7 @@ class Game:
         print("Выберите класс героя:")
         for i, cls in enumerate(CLASS_OF_CHARACTER.keys(), 1):
             print(f"{i}. {cls}")
-        choice = get_valid_choice("Ваш выбор  ", 1, 3)
+        choice = get_valid_choice("> ", 1, 3)
         selected_class = list(CLASS_OF_CHARACTER.keys())[choice - 1]
 
         strength = random.randint(1, 3)
@@ -279,9 +291,9 @@ class Game:
         if monster.drop:
             print(f"С {monster.name} выпало оружие: {monster.drop[0]} "
                   f"(урон {monster.drop[1]}, тип {monster.drop[2]})")
-            if get_yes_no(f"Хотите заменить текущее оружие? (y/n): {self.hero.weapon[0]} урон {self.hero.weapon[1]} тип {self.hero.weapon[2]} "):
+            if get_yes_no("Хотите заменить текущее оружие? (y/n): "):
                 self.hero.weapon = monster.drop
-                print(f"{self.hero.name} теперь использует {self.hero.weapon}!")
+                print(f"{self.hero.name} теперь использует {self.hero.weapon[0]}!")
 
         if self.victories < 5:
             self.hero.level_up()
@@ -302,10 +314,11 @@ class Game:
             self.play()
         else:
             print("Спасибо за игру!")
+            exit()
 
 
-
-
+# --------------------------
+# Запуск
+# --------------------------
 g=Game()
 g.menu()
-
