@@ -195,6 +195,37 @@ class Hero(Character):
         damage=base+bonus
         return (True,damage,desc.strip())
 
+    def attack(self,target):
+        self.attack_count+=1
+        self.turn_count+=1
+
+        hit,damage,desc=self.new_atask_damage(target)
+        if not hit:
+            print(f'{self.name} промахнулся' )
+            return
+        else:
+            target.take_damage(damage,source=self)
+
+
+    def take_damage(self,damage,source=None):
+        if self.levels["Воин"] >= 2 and source and source.strenght < self.strength:
+            damage-=3
+
+
+        if self.levels["Варвар"] >= 2:
+            damage-=self.endurance
+        damage=max(0,damage)
+        print(f'{self.name} получает {damage} урона. HP = {self.hp}/{self.max_hp}')
+
+    def det_main_class(self):
+        for cls , lvl in self.levels.items():
+            max_lvl=0
+            if lvl>max_lvl:
+                max_lvl=lvl
+                return max_lvl
+        return 'Воин'
+
+
 
 
 
@@ -224,7 +255,7 @@ class Game:
             try:
                 number = int(number)
                 if 1<=number<=3:
-                return number
+                    return number
                 else:
                     number = input('Введите значение 1, 2 или 3 ')
 
@@ -234,9 +265,12 @@ class Game:
         return number
 
 
-def create_character():
-    print('Выбери персонажа  (Воин : 1, Варвар : 2, Разбойник : 3) ')
-    choice_user=valid_choise(input('Введите значение 1, 2 или 3 '))
+    def create_character(self,):
+        print('Выбери персонажа  (Воин : 1, Варвар : 2, Разбойник : 3) ')
+        choice_user=self.valid_choise(input('Введите значение 1, 2 или 3 '))
+        return choice_user
+
+
 
     stats={
         'Сила':random.randint(1,3),
