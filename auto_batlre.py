@@ -3,9 +3,7 @@ import random
 import time
 import os
 
-# --------------------------
-# Вспомогательные функции
-# --------------------------
+
 def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
 
