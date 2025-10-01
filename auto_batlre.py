@@ -21,7 +21,7 @@ def animate_attack(attacker, defender):
 def get_valid_choice(prompt, min_val, max_val):
 
     while True:
-        choice = input(prompt)
+        choice = input(prompt).strip()
         if choice.isdigit():
             choice = int(choice)
             if min_val <= choice <= max_val:
@@ -30,7 +30,7 @@ def get_valid_choice(prompt, min_val, max_val):
 
 def get_yes_no(prompt):
     while True:
-        choice = input(prompt).lower()
+        choice = input(prompt).lower().strip()
         if choice in ["y", "n", "у", "н"]:
             return choice in ["y", "у"]
         print("Введите 'y' или 'n' (или 'у'/'н').")
@@ -240,7 +240,7 @@ class Game:
         self.hero = Hero(name, selected_class, strength, dexterity, endurance)
         print(f"Создан {selected_class} {name} со статами: "
               f"Сила {strength}, Ловкость {dexterity}, Выносливость {endurance}")
-        self.play()
+
 
     def battle(self, monster):
         clear_screen()
